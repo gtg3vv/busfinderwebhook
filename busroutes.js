@@ -31,7 +31,7 @@ restService.post('/uvabus', function(req, res) {
         source: 'uva-bus-webhook'
     });
 });
-restService.listen(restService.post('port'),function(){
+restService.listen(restService.get('port'),function(){
     console.log('service started...');
 });
 
