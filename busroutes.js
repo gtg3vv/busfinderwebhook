@@ -13,7 +13,7 @@ const bodyParser = require('body-parser');
 
 const restService = express();
 
-//restService.set('port',process.env.PORT || 3000);
+restService.set('port',process.env.PORT || 8080);
 
 
 restService.use(bodyParser.urlencoded({
@@ -31,9 +31,9 @@ restService.post('/uvabus', function(req, res) {
         source: 'uva-bus-webhook'
     });
 });
-// restService.listen(restService.post('port'),function(){
-//     console.log('service started...');
-// });
+restService.listen(restService.post('port'),function(){
+    console.log('service started...');
+});
 
 //this will always finish first
 function getStopCode(stopsearch,callback){
