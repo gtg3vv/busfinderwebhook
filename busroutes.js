@@ -13,20 +13,28 @@ const bodyParser = require('body-parser');
 
 const restService = express();
 
+restService.set('port',process.env.PORT || 3000);
+
+
 restService.use(bodyParser.urlencoded({
     extended: true
 }));
 
 restService.use(bodyParser.json());
 
+
 restService.post('/uvabus', function(req, res) {
-    var speech = req.body.result && req.body.result.parameters && req.body.result.parameters.echoText ? req.body.result.parameters.echoText : "Seems like some problem. Speak again."
+    var speech = req.body.result && req.body.result.parameters && req.body.result.parameters.busstop ? req.body.result.parameters.busstop : "Seems like some problem. Speak again."
     return res.json({
         speech: speech,
         displayText: speech,
         source: 'uva-bus-webhook'
     });
 });
+restService.listen(restService.get('port'),function(){
+    console.log('service started...');
+});
+
 //this will always finish first
 function getStopCode(stopsearch,callback){
     var searchurl="http://uva.transloc.com/m/search?s="+stopsearch;
