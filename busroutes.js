@@ -2,10 +2,31 @@
  
  
 //Gets the wait time for the next inner loop bus at bus stop Alderman @ AFC
+ 'use strict';
+
 var request = require("request");
-var promises = require('promises');
+var promises = require("promises");
 var cheerio = require('cheerio');
- 
+
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const restService = express();
+
+restService.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+restService.use(bodyParser.json());
+
+restService.post('/uvabus', function(req, res) {
+    var speech = req.body.result && req.body.result.parameters && req.body.result.parameters.echoText ? req.body.result.parameters.echoText : "Seems like some problem. Speak again."
+    return res.json({
+        speech: speech,
+        displayText: speech,
+        source: 'uva-bus-webhook'
+    });
+});
 //this will always finish first
 function getStopCode(stopsearch,callback){
     var searchurl="http://uva.transloc.com/m/search?s="+stopsearch;
