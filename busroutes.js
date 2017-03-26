@@ -24,17 +24,32 @@ restService.use(bodyParser.json());
 
 
 restService.post('/uvabus', function(req, res) {
-    var speech = req.body.result && req.body.result.parameters && req.body.result.parameters.busstop ? req.body.result.parameters.busstop : "Seems like some problem. Speak again."
-    return res.json({
-        speech: speech,
-        displayText: speech,
+    if (req.body.result && req.body.result.parameters && req.body.result.parameters.busstop)
+    {
+        var stop = req.body.result.parameters.busstop;
+        getAnswer(stop,function(val){
+            return res.json({
+            speech: val,
+            displayText: val,
+            source: 'uva-bus-webhook'
+        });
+
+    });
+    }
+    else{
+        return res.json({
+        speech: "Seems like some problem. Speak again.",
+        displayText: "Seems like some problem. Speak again.",
         source: 'uva-bus-webhook'
     });
+
+    }
+    
 });
 restService.listen(restService.get('port'),function(){
     console.log('service started...');
 });
-
+/*
 //this will always finish first
 function getStopCode(stopsearch,callback){
     var searchurl="http://uva.transloc.com/m/search?s="+stopsearch;
@@ -74,4 +89,49 @@ getStopCode(argument,function(val){
             }
         }
     });
+});*/
+function getStopCode(stopsearch, callback){
+  var searchurl="http://uva.transloc.com/m/search?s="+stopsearch;
+  var stopcode;
+
+  request({
+    uri: searchurl,
+  }, function(error, response, body) {
+    var $ = cheerio.load(body);
+    stopcode=$('.posted').text().substring(11,14);
+    callback(stopcode);
+  });
+}
+
+//actual google home part
+function getAnswer(argument,callback){
+  getStopCode(argument,function(val){
+  request({
+      uri:"http://uva.transloc.com/m/stop/code/"+val,
+  }, function(error, response, body) {
+    var dict = {
+      "Inner U-Loop": 4003290,
+      "Northline": 4003286,
+      "Outer U-Loop": 4003294
+    };
+    var response;
+    var cheerio = require('cheerio'), $ = cheerio.load(body);
+    for(var key in dict){
+      var route="#route_" + dict[key]
+      if($('.wait_time', route).text()!=""){
+        response += "\nThe " + key + " will arrive in";
+        response += $('.wait_time', route).text();
+      }
+      else{
+        response += "\nThe " + key + " does not come to this stop.";
+      }
+
+    }
+    callback(response);
+
+
+  });
+
+
 });
+}
