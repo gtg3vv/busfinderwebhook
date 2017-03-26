@@ -2,7 +2,7 @@
  
  
 //Gets the wait time for the next inner loop bus at bus stop Alderman @ AFC
- 'use strict';
+// 'use strict';
 
 var request = require("request");
 var promises = require("promises");
