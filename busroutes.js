@@ -114,7 +114,7 @@ function getAnswer(argument,callback){
       "Northline": 4003286,
       "Outer U-Loop": 4003294
     };
-    var response;
+    var response = "Stop " + val;
     var cheerio = require('cheerio'), $ = cheerio.load(body);
     for(var key in dict){
       var route="#route_" + dict[key]
